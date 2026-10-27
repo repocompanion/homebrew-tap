@@ -1,9 +1,18 @@
 name: ci
 
+# The tap only changes when a new formula version is committed, so run on
+# formula (or workflow) changes instead of every push. Use workflow_dispatch to
+# re-check after a Homebrew or runner-image update.
 on:
   push:
     branches: [main]
+    paths:
+      - "Formula/**"
+      - ".github/workflows/**"
   pull_request:
+    paths:
+      - "Formula/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
