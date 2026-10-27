@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      # Installs Homebrew on Linux, otherwise reuses the runner's Homebrew.
+      # It also taps this repository at the tested commit and trusts the tap,
+      # so no actions/checkout step is needed.
+      - uses: Homebrew/actions/setup-homebrew@d482da0e602890d3160aade42e72c8556103bf04 # 2026.10.26.1
+        id: brew
+
+      - name: audit formula
+        if: runner.os == 'macOS'
+        env:
+          TAP: ${{ steps.brew.outputs.tap-name }}
+        run: brew audit --strict --online --os=all --arch=all "$TAP/repo-companion"
+
+      - name: style formula
+        if: runner.os == 'macOS'
+        env:
+          TAP: ${{ steps.brew.outputs.tap-name }}
+        run: brew style "$TAP/repo-companion"
+
+      - name: install and test formula
+        env:
+          TAP: ${{ steps.brew.outputs.tap-name }}
+        run: |
+          brew install "$TAP/repo-companion"
+          brew test "$TAP/repo-companion"
+          companion version

@@ -1,5 +1,7 @@
 # Repo Companion — Homebrew tap
 
+[![CI](https://github.com/repocompanion/homebrew-tap/actions/workflows/ci.yml/badge.svg)](https://github.com/repocompanion/homebrew-tap/actions/workflows/ci.yml)
+
 Homebrew formula for [Repo Companion](https://repocompanion.com), a Git-backed
 documentation store and guidance layer for coding agents and their humans.
 
