@@ -4,7 +4,7 @@ Homebrew formula for [Repo Companion](https://repocompanion.com), a Git-backed
 documentation store and guidance layer for coding agents and their humans.
 
 The formula installs the `companion` CLI (macOS Intel/Apple Silicon and Linux
-x86_64/arm64) from the signed-off release archives published in
+x86_64/arm64) from the release archives published in
 [repocompanion/companion](https://github.com/repocompanion/companion/releases).
 
 ## Install
