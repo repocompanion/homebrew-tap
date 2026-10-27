@@ -47,5 +47,21 @@ The formula is updated by hand after each upstream release, from the release
 `checksums.txt`. See the upstream
 [release process](https://github.com/repocompanion/companion/blob/main/VERSIONING.md#release-process).
 
+To bump it:
+
+1. Open the release's `checksums.txt` and copy the four archive checksums
+   (`darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`).
+2. Update the four `url` stanzas and their `sha256` values in
+   `Formula/repo-companion.rb`. The version is inferred from the URLs, so there
+   is no separate `version` line to change.
+3. Check it locally, then commit and push:
+
+   ```bash
+   brew audit --strict --online repocompanion/tap/repo-companion
+   brew style repocompanion/tap/repo-companion
+   brew reinstall repocompanion/tap/repo-companion
+   brew test repo-companion
+   ```
+
 The formula is distributed under the same Apache-2.0 license as the upstream
 project.
