@@ -10,10 +10,9 @@ on:
     paths:
       - "Formula/**"
       - ".github/workflows/**"
+  # Every pull request runs the checks: they are required by branch protection,
+  # so a path filter here would leave some PRs permanently unmergeable.
   pull_request:
-    paths:
-      - "Formula/**"
-      - ".github/workflows/**"
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:
