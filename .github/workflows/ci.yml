@@ -1,8 +1,9 @@
 name: ci
 
-# The tap only changes when a new formula version is committed, so run on
-# formula (or workflow) changes instead of every push. Use workflow_dispatch to
-# re-check after a Homebrew or runner-image update.
+# The tap only changes when a new formula version is committed, so push and PR
+# runs are limited to formula (or workflow) changes. The weekly schedule keeps
+# validating against current Homebrew and fails if the tap falls behind the
+# latest upstream release. Use workflow_dispatch to re-check on demand.
 on:
   push:
     branches: [main]
@@ -13,6 +14,8 @@ on:
     paths:
       - "Formula/**"
       - ".github/workflows/**"
+  schedule:
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -49,6 +52,32 @@ jobs:
         env:
           TAP: ${{ steps.brew.outputs.tap-name }}
         run: brew style "$TAP/repo-companion"
+
+      - name: livecheck formula
+        if: runner.os == 'macOS'
+        env:
+          TAP: ${{ steps.brew.outputs.tap-name }}
+        run: brew livecheck --quiet --formula "$TAP/repo-companion"
+
+      - name: check the tap is not behind the latest release
+        if: runner.os == 'macOS' && github.event_name != 'push' && github.event_name != 'pull_request'
+        env:
+          TAP: ${{ steps.brew.outputs.tap-name }}
+        run: |
+          set -euo pipefail
+          json="$(brew livecheck --json --quiet --formula "$TAP/repo-companion")"
+          current="$(jq -r '.[0].version.current // empty' <<<"$json")"
+          latest="$(jq -r '.[0].version.latest // empty' <<<"$json")"
+          if [[ -z "$current" || -z "$latest" ]]; then
+            echo "::error::livecheck could not resolve the formula and upstream versions"
+            echo "$json"
+            exit 1
+          fi
+          echo "formula is $current; latest upstream release is $latest"
+          if [[ "$current" != "$latest" ]]; then
+            echo "::error::tap is behind: run scripts/bump.py v$latest and merge the PR"
+            exit 1
+          fi
 
       - name: install and test formula
         env:

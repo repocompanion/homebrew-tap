@@ -45,25 +45,30 @@ brew install gh                # token source for GitHub PR operations
 
 ## Maintenance
 
-The formula is updated by hand after each upstream release, from the release
-`checksums.txt`. See the upstream
-[release process](https://github.com/repocompanion/companion/blob/main/VERSIONING.md#release-process).
+A new upstream release means one formula bump. The version is inferred from the
+four release URLs, so there is no separate `version` line to edit.
 
-To bump it:
+```bash
+scripts/bump.py v0.3.0        # rewrite the URLs and SHA-256s from checksums.txt
+scripts/bump.py v0.3.0 --pr   # the same, then branch, commit, push, and open a PR
+```
 
-1. Open the release's `checksums.txt` and copy the four archive checksums
-   (`darwin_amd64`, `darwin_arm64`, `linux_amd64`, `linux_arm64`).
-2. Update the four `url` stanzas and their `sha256` values in
-   `Formula/repo-companion.rb`. The version is inferred from the URLs, so there
-   is no separate `version` line to change.
-3. Check it locally, then commit and push:
+The script downloads the release's
+[`checksums.txt`](https://github.com/repocompanion/companion/releases/latest),
+maps each archive to its stanza, and refuses to guess when a platform is
+missing. `--checksums path/to/checksums.txt` uses a local file instead of
+downloading one.
 
-   ```bash
-   brew audit --strict --online repocompanion/tap/repo-companion
-   brew style repocompanion/tap/repo-companion
-   brew reinstall repocompanion/tap/repo-companion
-   brew test repo-companion
-   ```
+Check it before pushing (CI runs the same checks on macOS and Linux):
 
-The formula is distributed under the same Apache-2.0 license as the upstream
-project.
+```bash
+brew audit --strict --online repocompanion/tap/repo-companion
+brew style repocompanion/tap/repo-companion
+brew reinstall repocompanion/tap/repo-companion
+brew test repo-companion
+```
+
+CI runs on pushes and pull requests that touch `Formula/**` or the workflow. A
+weekly scheduled run also fails when the tap is behind the latest GitHub
+release, which is the "forgot to bump" alarm. `livecheck` reads the latest
+release, so prereleases are ignored.

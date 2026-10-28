@@ -3,6 +3,11 @@ class RepoCompanion < Formula
   homepage "https://repocompanion.com"
   license "Apache-2.0"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/repocompanion/companion/releases/download/v0.2.0/companion_0.2.0_darwin_arm64.tar.gz"
