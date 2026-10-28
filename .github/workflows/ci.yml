@@ -1,7 +1,8 @@
 name: ci
 
-# The tap only changes when a new formula version is committed, so push and PR
-# runs are limited to formula (or workflow) changes. The weekly schedule keeps
+# The tap only changes when a new formula version is committed, so push runs are
+# limited to formula (or workflow) changes. Pull requests always run because
+# their checks are required by branch protection. The weekly schedule keeps
 # validating against current Homebrew and fails if the tap falls behind the
 # latest upstream release. Use workflow_dispatch to re-check on demand.
 on:
