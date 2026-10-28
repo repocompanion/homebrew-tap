@@ -68,7 +68,11 @@ brew reinstall repocompanion/tap/repo-companion
 brew test repo-companion
 ```
 
-CI runs on pushes and pull requests that touch `Formula/**` or the workflow. A
-weekly scheduled run also fails when the tap is behind the latest GitHub
-release, which is the "forgot to bump" alarm. `livecheck` reads the latest
-release, so prereleases are ignored.
+`main` is protected: changes land through a pull request and the
+`macos-latest` and `ubuntu-latest` checks must pass. `scripts/bump.py --pr`
+does the branch, commit, push, and PR in one step.
+
+CI runs on every pull request and on pushes that touch `Formula/**` or the
+workflow. A weekly scheduled run also fails when the tap is behind the latest
+GitHub release, which is the "forgot to bump" alarm. `livecheck` reads the
+latest release, so prereleases are ignored.
